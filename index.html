@@ -1,0 +1,1494 @@
+﻿<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coppel BigQuery AI Intelligence Hub | PoC por SIKAI Consulting</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            sikai: {
+              blue: '#1a88ff',
+              cyan: '#26d8c4',
+              dark: '#070b14',
+              card: '#0d1527',
+              border: 'rgba(38, 216, 196, 0.2)'
+            },
+            coppel: {
+              blue: '#005baa',
+              yellow: '#ffd100',
+              hoverYellow: '#e5bc00'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #060913;
+      background-image: 
+        radial-gradient(circle at 10% 15%, rgba(0, 91, 170, 0.25) 0%, transparent 40%),
+        radial-gradient(circle at 90% 85%, rgba(38, 216, 196, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(255, 209, 0, 0.05) 0%, transparent 60%);
+      background-attachment: fixed;
+    }
+    .glass-panel {
+      background: rgba(13, 21, 39, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+    }
+    .glass-card {
+      background: rgba(17, 27, 49, 0.6);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(38, 216, 196, 0.15);
+      transition: all 0.25s ease;
+    }
+    .glass-card:hover {
+      border-color: rgba(38, 216, 196, 0.4);
+      transform: translateY(-2px);
+    }
+    .badge-glow {
+      box-shadow: 0 0 20px -2px rgba(38, 216, 196, 0.35);
+    }
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #090e1a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1c2b4a;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #26d8c4;
+    }
+  </style>
+</head>
+
+<body class="text-slate-100 min-h-screen font-sans antialiased selection:bg-sikai-cyan selection:text-black">
+
+  <!-- TOP STRIP: COPPEL EXCLUSIVE BADGE -->
+  <div class="bg-gradient-to-r from-coppel-blue via-blue-900 to-sikai-dark border-b border-blue-500/20 px-4 py-2 text-xs flex justify-between items-center text-slate-300">
+    <div class="flex items-center gap-2">
+      <span class="inline-block w-2.5 h-2.5 rounded-full bg-coppel-yellow animate-ping"></span>
+      <span class="font-semibold text-white">PROPUESTA TÉCNICA EXCLUSIVA:</span>
+      <span class="text-yellow-400 font-medium">GRUPO COPPEL & BANCOPPEL</span>
+      <span class="hidden md:inline text-slate-400">| Google BigQuery + IA Generativa & Dashboards Inteligentes</span>
+    </div>
+    <div class="flex items-center gap-4 text-xs font-mono">
+      <span class="text-sikai-cyan">Liderado por: Maykol Sicard (SIKAI)</span>
+      <span class="hidden sm:inline bg-slate-800/80 px-2 py-0.5 rounded text-slate-300 border border-slate-700">PoC Activa v1.0</span>
+    </div>
+  </div>
+
+  <!-- NAVIGATION HEADER -->
+  <header class="sticky top-0 z-50 glass-panel border-b border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- LOGOS -->
+      <div class="flex items-center gap-3">
+        <div class="bg-coppel-blue text-coppel-yellow font-black px-2.5 py-1 rounded tracking-wider text-sm border border-yellow-400/40">
+          COPPEL
+        </div>
+        <span class="text-slate-600 font-light text-lg">✕</span>
+        <div class="flex items-center gap-2">
+          <img src="sikai_logo.png" alt="SIKAI Consulting" class="h-8 object-contain">
+        </div>
+      </div>
+
+      <!-- TABS BUTTONS -->
+      <nav class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800 text-xs font-medium">
+        <button onclick="switchTab('video')" id="tab-btn-video" class="tab-btn px-3 py-1.5 rounded-lg bg-sikai-cyan text-black font-semibold shadow-sm transition">
+          🎥 Video Demostrativo
+        </button>
+        <button onclick="switchTab('poc')" id="tab-btn-poc" class="tab-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
+          ⚡ PoC BigQuery + IA
+        </button>
+        <button onclick="switchTab('metodologia')" id="tab-btn-metodologia" class="tab-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
+          🧭 Metodología SIKAI
+        </button>
+        <button onclick="switchTab('casos')" id="tab-btn-casos" class="tab-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
+          🏆 Trayectoria & Casos
+        </button>
+        <button onclick="switchTab('contacto')" id="tab-btn-contacto" class="tab-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
+          🌐 Maykol Sicard
+        </button>
+      </nav>
+
+      <!-- QUICK CONTACT CTA -->
+      <div class="flex items-center gap-2">
+        <a href="https://wa.me/573212614848?text=Hola%20Maykol,%20revisamos%20la%20PoC%20de%20BigQuery%20para%20Coppel" target="_blank" class="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow transition">
+          <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+          <span>Agendar en WhatsApp</span>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- ========================================== -->
+    <!-- TAB 1: PROOF OF CONCEPT (BIGQUERY + IA)   -->
+    <!-- ========================================== -->
+    <section id="tab-video" class="tab-content space-y-8">
+      
+      <div class="glass-panel p-6 sm:p-8 rounded-2xl max-w-4xl mx-auto space-y-6">
+        
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <span class="text-xs font-semibold text-sikai-cyan uppercase tracking-widest px-3 py-1 rounded-full bg-sikai-cyan/10 border border-sikai-cyan/30">Video Explicativo</span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-2">Cómo SIKAI implementa BigQuery + IA para Coppel</h2>
+            <p class="text-slate-300 text-sm mt-1">Recorrido ejecutivo de nuestra propuesta, casos de éxito en producción, PoC interactiva sobre Google BigQuery y el Desafío Quick Win.</p>
+          </div>
+          <button onclick="switchTab('poc')" class="bg-sikai-cyan hover:bg-teal-300 text-black font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-lg transition cursor-pointer">
+            <span>⚡ Probar PoC Interactiva</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- REAL VIDEO PLAYER -->
+        <div class="relative aspect-video rounded-2xl overflow-hidden bg-slate-950 border border-sikai-cyan/40 shadow-2xl">
+          <video controls preload="metadata" class="w-full h-full object-cover rounded-2xl">
+            <source src="video_coppel.mp4" type="video/mp4">
+            Tu navegador no soporta la reproducción de video HTML5.
+          </video>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: PROOF OF CONCEPT (BIGQUERY + IA)   -->
+    <!-- ========================================== -->
+    <section id="tab-poc" class="tab-content hidden space-y-8">
+      
+      <!-- HERO INTRO + DIVISION SWITCHER -->
+      <div class="glass-panel p-6 sm:p-8 rounded-2xl relative overflow-hidden border border-sikai-cyan/25">
+        <div class="absolute -right-16 -top-16 w-72 h-72 bg-sikai-cyan/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="flex flex-wrap items-start justify-between gap-6">
+          <div class="max-w-3xl space-y-2.5">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sikai-cyan/10 text-sikai-cyan text-xs font-semibold border border-sikai-cyan/30">
+              <span class="w-2 h-2 rounded-full bg-sikai-cyan animate-ping"></span>
+              <span>PoC Funcional en Vivo · BigQuery Semantic Layer + Gemini 2.0</span>
+            </div>
+            <h1 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
+              Pregunta en español; recibe <span class="text-transparent bg-clip-text bg-gradient-to-r from-sikai-cyan via-sikai-blue to-coppel-yellow">respuestas ejecutivas, datos y planes de acción</span>
+            </h1>
+            <p class="text-slate-300 text-sm leading-relaxed">
+              Esta Prueba de Concepto demuestra cómo SIKAI conecta el data lake de <strong>Google BigQuery</strong> de Grupo Coppel con agentes analíticos de IA que entregan primero la <strong>respuesta ejecutiva en lenguaje natural</strong>, respaldada por los datos tabulares, el gráfico en vivo y la consulta GoogleSQL optimizada.
+            </p>
+          </div>
+
+          <!-- LIVE CONNECTION STATUS -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 text-xs font-mono space-y-1.5 shrink-0">
+            <div class="flex items-center gap-2 text-emerald-400 font-semibold">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>CONECTADO A BIGQUERY ENGINE</span>
+            </div>
+            <div class="text-slate-400">Dataset: <span class="text-white" id="active-dataset-badge">coppel_prod_lake.bancoppel</span></div>
+            <div class="text-slate-400">Motor IA: <span class="text-sikai-cyan">Vertex AI · Gemini 2.0 Flash</span></div>
+          </div>
+        </div>
+
+        <!-- DIVISION SWITCHER -->
+        <div class="mt-6 pt-5 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+            <span class="font-semibold text-slate-300">Unidad de Negocio Coppel:</span>
+            <div class="flex flex-wrap bg-slate-900 p-1 rounded-xl border border-slate-700 gap-1">
+              <button onclick="setDivision('banco')" id="div-btn-banco" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-sikai-blue text-white transition cursor-pointer">
+                💳 BanCoppel (Crédito & Cartera)
+              </button>
+              <button onclick="setDivision('retail')" id="div-btn-retail" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition cursor-pointer">
+                🛍️ Tiendas Coppel (Retail & Stock)
+              </button>
+              <button onclick="setDivision('logistica')" id="div-btn-logistica" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition cursor-pointer">
+                🚚 CEDIS & Cadena de Suministro
+              </button>
+            </div>
+          </div>
+          <div class="text-xs text-slate-400 flex items-center gap-3">
+            <span class="px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-mono">✓ Gobernanza & Row-Level Security Activo</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI METRICS GRID (DYNAMIC BY DIVISION / QUERY) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="glass-card p-5 rounded-xl border-l-4 border-l-sikai-cyan">
+          <div class="flex justify-between items-start">
+            <span class="text-xs font-medium text-slate-400 uppercase tracking-wider" id="kpi-label-1">Colocación Quincenal</span>
+            <span class="p-2 rounded-lg bg-blue-500/10 text-sikai-cyan border border-blue-500/20"><i data-lucide="trending-up" class="w-4 h-4"></i></span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span class="text-2xl font-extrabold text-white" id="kpi-val-1">$742.0 M MXN</span>
+            <span class="text-xs font-semibold text-amber-400" id="kpi-delta-1">-6.8% en Sinaloa</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-1" id="kpi-sub-1">Detectado desvío en score de aprobación regional</p>
+        </div>
+
+        <div class="glass-card p-5 rounded-xl border-l-4 border-l-coppel-yellow">
+          <div class="flex justify-between items-start">
+            <span class="text-xs font-medium text-slate-400 uppercase tracking-wider" id="kpi-label-2">Oportunidad Detectada por IA</span>
+            <span class="p-2 rounded-lg bg-yellow-500/10 text-coppel-yellow border border-yellow-500/20"><i data-lucide="sparkles" class="w-4 h-4"></i></span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span class="text-2xl font-extrabold text-coppel-yellow" id="kpi-val-2">+$14.2 M MXN</span>
+            <span class="text-xs font-semibold text-emerald-400" id="kpi-delta-2">Recuperables</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-1" id="kpi-sub-2">Calibrando regla para clientes puntuales >24m</p>
+        </div>
+
+        <div class="glass-card p-5 rounded-xl border-l-4 border-l-emerald-400">
+          <div class="flex justify-between items-start">
+            <span class="text-xs font-medium text-slate-400 uppercase tracking-wider" id="kpi-label-3">Velocidad de Respuesta</span>
+            <span class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><i data-lucide="zap" class="w-4 h-4"></i></span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span class="text-2xl font-extrabold text-white" id="kpi-val-3">142 ms</span>
+            <span class="text-xs font-semibold text-emerald-400" id="kpi-delta-3">vs 4 días antes</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-1" id="kpi-sub-3">Cero dependencia de tickets manuales a TI</p>
+        </div>
+
+        <div class="glass-card p-5 rounded-xl border-l-4 border-l-purple-400">
+          <div class="flex justify-between items-start">
+            <span class="text-xs font-medium text-slate-400 uppercase tracking-wider" id="kpi-label-4">Optimización BigQuery</span>
+            <span class="p-2 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20"><i data-lucide="cpu" class="w-4 h-4"></i></span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span class="text-2xl font-extrabold text-white" id="kpi-val-4">184 MB</span>
+            <span class="text-xs font-semibold text-emerald-400" id="kpi-delta-4">-89% costo scan</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-1" id="kpi-sub-4">Podado automático de particiones por fecha_corte</p>
+        </div>
+      </div>
+
+      <!-- MAIN INTERACTIVE WORKSPACE -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- LEFT COLUMN (7 Cols): NATURAL LANGUAGE COPILOT + EXECUTIVE ANSWER + DATA TABLE + SQL -->
+        <div class="lg:col-span-7 space-y-6">
+          
+          <!-- SEARCH & SCENARIO SELECTOR PANEL -->
+          <div class="glass-panel p-6 rounded-2xl space-y-4 border border-sikai-cyan/30">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2.5">
+                <div class="p-2.5 rounded-xl bg-gradient-to-br from-sikai-cyan/25 to-sikai-blue/25 text-sikai-cyan border border-sikai-cyan/40">
+                  <i data-lucide="message-square-code" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h2 class="text-lg font-extrabold text-white">Copiloto Ejecutivo de Datos (NL2BigQuery)</h2>
+                  <p class="text-xs text-slate-400">Haz clic en un caso real de Coppel o escribe cualquier pregunta de negocio y presiona <strong>Generar Respuesta IA</strong></p>
+                </div>
+              </div>
+              <span class="text-[11px] font-mono px-2.5 py-1 bg-emerald-500/10 rounded-full border border-emerald-500/30 text-emerald-300" id="copilot-status-pill">● Listo para consultar</span>
+            </div>
+
+            <!-- INPUT BAR -->
+            <div class="flex flex-col sm:flex-row gap-2.5">
+              <div class="relative flex-1">
+                <input type="text" id="nlQueryInput" 
+                       onkeydown="if(event.key==='Enter') executeNLQuery(null)"
+                       placeholder="Escribe tu pregunta a BigQuery en español (ej: ¿Qué tiendas tienen mayor mora o quiebre de stock?)..." 
+                       value="¿Por qué cayó la colocación de crédito en Sinaloa la última quincena?"
+                       class="w-full bg-slate-900/95 border-2 border-slate-700 focus:border-sikai-cyan rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none transition shadow-inner">
+              </div>
+              <button id="btn-execute-query" onclick="executeNLQuery(null)" class="bg-gradient-to-r from-sikai-cyan to-sikai-blue hover:brightness-110 text-black font-extrabold px-5 py-3.5 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-sikai-cyan/20 cursor-pointer shrink-0">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                <span>Generar Respuesta IA</span>
+              </button>
+            </div>
+
+            <!-- 6 SCENARIO CHIPS -->
+            <div class="space-y-1.5">
+              <div class="text-[11px] text-slate-400 font-medium">Selecciona un escenario de negocio de Grupo Coppel para simular en vivo:</div>
+              <div class="flex flex-wrap gap-2 text-xs" id="scenario-chips-container">
+                <button onclick="setQuery(0)" id="chip-0" class="scenario-chip px-3 py-1.5 rounded-lg bg-sikai-cyan/20 text-sikai-cyan border border-sikai-cyan/50 font-semibold transition cursor-pointer">
+                  📉 1. Caída Crédito Sinaloa
+                </button>
+                <button onclick="setQuery(1)" id="chip-1" class="scenario-chip px-3 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer">
+                  🛵 2. Quiebre Stock Motos
+                </button>
+                <button onclick="setQuery(2)" id="chip-2" class="scenario-chip px-3 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer">
+                  🎯 3. Predicción Buen Fin ML
+                </button>
+                <button onclick="setQuery(3)" id="chip-3" class="scenario-chip px-3 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer">
+                  ⚠️ 4. Alerta Mora Temprana
+                </button>
+                <button onclick="setQuery(4)" id="chip-4" class="scenario-chip px-3 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer">
+                  🚚 5. Cuello de Botella CEDIS
+                </button>
+                <button onclick="setQuery(5)" id="chip-5" class="scenario-chip px-3 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer">
+                  📱 6. Conversión App vs Tienda
+                </button>
+              </div>
+            </div>
+
+            <!-- EXECUTION PIPELINE TRACE (ANIMATES ON QUERY) -->
+            <div id="ai-pipeline-bar" class="bg-slate-950/90 rounded-xl p-3 border border-slate-800/90 flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono">
+              <div class="flex items-center gap-2 text-emerald-400" id="pipe-step-1">
+                <span>✓ 1. Intención Semántica</span>
+              </div>
+              <span class="text-slate-600">➔</span>
+              <div class="flex items-center gap-2 text-sikai-cyan" id="pipe-step-2">
+                <span>✓ 2. GoogleSQL en BigQuery (142ms)</span>
+              </div>
+              <span class="text-slate-600">➔</span>
+              <div class="flex items-center gap-2 text-coppel-yellow" id="pipe-step-3">
+                <span>✓ 3. Respuesta Ejecutiva Generada</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============================================================== -->
+          <!-- NATURAL LANGUAGE EXECUTIVE RESPONSE FIRST (HIGHLIGHTED PANEL) -->
+          <!-- ============================================================== -->
+          <div id="nl-response-card" class="glass-panel p-6 rounded-2xl border-2 border-sikai-cyan/40 bg-gradient-to-br from-slate-900/95 via-blue-950/30 to-slate-900/95 space-y-5 shadow-2xl transition-all duration-300">
+            
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+              <div class="flex items-center gap-2.5">
+                <span class="px-2.5 py-1 rounded-md bg-sikai-cyan text-black font-extrabold text-xs uppercase tracking-wider">Respuesta en Lenguaje Natural</span>
+                <span class="text-xs text-slate-300 font-semibold" id="nl-question-echo">Análisis para: «¿Por qué cayó la colocación de crédito en Sinaloa la última quincena?»</span>
+              </div>
+              <span class="text-xs font-mono text-sikai-cyan" id="sql-perf-stats">⏱️ 142ms · 💾 184 MB escaneados</span>
+            </div>
+
+            <!-- DIRECT NATURAL LANGUAGE NARRATIVE -->
+            <div class="bg-slate-950/80 p-4 rounded-xl border border-sikai-cyan/25 text-sm text-slate-100 leading-relaxed" id="nlDirectAnswer">
+              <strong>Respuesta Directa:</strong> Durante los últimos 15 días, la colocación de crédito de <strong>BanCoppel en Sinaloa disminuyó un 6.8% (-$14.2 M MXN)</strong>. Los datos de BigQuery confirman que <strong>no hay caída de demanda</strong> (las solicitudes en tienda subieron +4.2%), sino que el ajuste del umbral de score crediticio aplicado el día 4 del mes rechazó automáticamente al 28% de los clientes recurrentes en <strong>Culiacán Centro, Los Mochis y Mazatlán Norte</strong>.
+            </div>
+
+            <!-- 3 STRUCTURED INSIGHT PILLARS: CAUSA RAÍZ / IMPACTO / RECOMENDACIÓN -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs" id="aiInsightOutput">
+              <div class="bg-slate-900/90 p-3.5 rounded-xl border border-red-500/30 space-y-1">
+                <div class="font-bold text-red-400 uppercase tracking-wider flex items-center gap-1.5">🔍 Causa Raíz en Datos</div>
+                <p class="text-slate-300 leading-relaxed" id="insight-cause">Regla de score <code class="text-red-300">R-402</code> elevó el corte de 620 a 665 puntos en préstamos de consumo y línea blanca.</p>
+              </div>
+              <div class="bg-slate-900/90 p-3.5 rounded-xl border border-amber-500/30 space-y-1">
+                <div class="font-bold text-coppel-yellow uppercase tracking-wider flex items-center gap-1.5">💰 Impacto en Negocio</div>
+                <p class="text-slate-300 leading-relaxed" id="insight-impact"><strong>$14.2 M MXN</strong> en créditos no colocados en 15 días (concentrados 68% en Culiacán y Los Mochis).</p>
+              </div>
+              <div class="bg-slate-900/90 p-3.5 rounded-xl border border-emerald-500/30 space-y-1">
+                <div class="font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">🚀 Acción Sugerida IA</div>
+                <p class="text-slate-300 leading-relaxed" id="insight-action">Activar pre-aprobación cruzada para clientes con +24 meses de historial puntual en Tiendas Coppel.</p>
+              </div>
+            </div>
+
+            <!-- ACTIONABLE WORKFLOW TRIGGER BAR -->
+            <div class="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-slate-800/80">
+              <div class="text-xs text-slate-400 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span id="action-status-text">Flujo de automatización SIKAI listo para ejecutar esta recomendación.</span>
+              </div>
+              <button onclick="triggerAutomatedAction()" id="btn-trigger-action" class="bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold px-4 py-2 rounded-xl text-xs transition flex items-center gap-1.5 shadow-md cursor-pointer">
+                <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                <span id="btn-trigger-label">Ejecutar Calibración en Motor de Riesgo</span>
+              </button>
+            </div>
+
+          </div>
+
+          <!-- ============================================================== -->
+          <!-- DATA TABLE & GOOGLESQL TABS (EVIDENCE FROM BIGQUERY)           -->
+          <!-- ============================================================== -->
+          <div class="glass-panel p-5 rounded-2xl space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2 bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs">
+                <button onclick="switchEvidenceTab('table')" id="ev-btn-table" class="px-3 py-1.5 rounded-lg font-bold bg-sikai-cyan text-black transition cursor-pointer">
+                  📊 Tabla de Resultados BigQuery
+                </button>
+                <button onclick="switchEvidenceTab('sql')" id="ev-btn-sql" class="px-3 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white transition cursor-pointer">
+                  💻 Código GoogleSQL Generado
+                </button>
+              </div>
+              <span class="text-xs font-mono text-slate-400" id="sql-target-table">Tabla: coppel_prod_lake.bancoppel_creditos</span>
+            </div>
+
+            <!-- TABLA DE RESULTADOS EN VIVO -->
+            <div id="evidence-table-container" class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/80">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="border-b border-slate-800 bg-slate-900/90 text-slate-400 font-mono uppercase text-[11px]" id="bq-table-head">
+                    <th class="py-2.5 px-3">Sucursal / Región</th>
+                    <th class="py-2.5 px-3">Solicitudes</th>
+                    <th class="py-2.5 px-3">Tasa Aprobación</th>
+                    <th class="py-2.5 px-3">Monto No Colocado</th>
+                    <th class="py-2.5 px-3">Estado IA</th>
+                  </tr>
+                </thead>
+                <tbody id="bq-table-body" class="divide-y divide-slate-800/70 text-slate-200 font-sans">
+                  <tr>
+                    <td class="py-2.5 px-3 font-semibold text-white">Los Mochis Centro</td>
+                    <td class="py-2.5 px-3 font-mono">4,820</td>
+                    <td class="py-2.5 px-3 font-mono text-red-400">51.2% (-14%)</td>
+                    <td class="py-2.5 px-3 font-mono font-bold text-coppel-yellow">$4.5 M MXN</td>
+                    <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30 text-[10px]">Crítico</span></td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 px-3 font-semibold text-white">Culiacán Centro</td>
+                    <td class="py-2.5 px-3 font-mono">6,190</td>
+                    <td class="py-2.5 px-3 font-mono text-red-400">53.8% (-11%)</td>
+                    <td class="py-2.5 px-3 font-mono font-bold text-coppel-yellow">$4.2 M MXN</td>
+                    <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30 text-[10px]">Crítico</span></td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 px-3 font-semibold text-white">Guasave Norte</td>
+                    <td class="py-2.5 px-3 font-mono">3,110</td>
+                    <td class="py-2.5 px-3 font-mono text-amber-400">58.4% (-7%)</td>
+                    <td class="py-2.5 px-3 font-mono font-bold text-coppel-yellow">$2.8 M MXN</td>
+                    <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px]">Alerta</span></td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 px-3 font-semibold text-white">Mazatlán Norte</td>
+                    <td class="py-2.5 px-3 font-mono">2,890</td>
+                    <td class="py-2.5 px-3 font-mono text-amber-400">60.1% (-6%)</td>
+                    <td class="py-2.5 px-3 font-mono font-bold text-coppel-yellow">$1.8 M MXN</td>
+                    <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px]">Alerta</span></td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 px-3 font-semibold text-white">Navolato</td>
+                    <td class="py-2.5 px-3 font-mono">1,540</td>
+                    <td class="py-2.5 px-3 font-mono text-emerald-400">66.9% (-1%)</td>
+                    <td class="py-2.5 px-3 font-mono font-bold text-slate-300">$0.9 M MXN</td>
+                    <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px]">Estable</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- PANEL SQL GENERADO (OCULTO POR DEFECTO PARA PRIORIZAR LENGUAJE NATURAL) -->
+            <div id="evidence-sql-container" class="hidden space-y-2">
+              <div class="flex items-center justify-between text-xs text-slate-400">
+                <span>Consulta generada automáticamente con validación de esquema y particiones:</span>
+                <button onclick="copySQL()" id="btn-copy-sql" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-sikai-cyan border border-slate-700 font-mono text-[11px] cursor-pointer">
+                  📋 Copiar GoogleSQL
+                </button>
+              </div>
+              <pre class="bg-black/80 p-4 rounded-xl text-xs font-mono text-emerald-400 overflow-x-auto border border-emerald-950/60" id="sqlOutput">SELECT 
+    sucursal_region, 
+    COUNT(solicitud_id) AS total_solicitudes,
+    ROUND(AVG(tasa_aprobacion), 2) AS pct_aprobacion,
+    SUM(monto_rechazado_mxn) AS perdida_oportunidad_mxn
+FROM `coppel_prod_lake.bancoppel_creditos`
+WHERE estado = 'Sinaloa' 
+  AND fecha_corte BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 15 DAY) AND CURRENT_DATE()
+GROUP BY 1
+ORDER BY perdida_oportunidad_mxn DESC
+LIMIT 5;</pre>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN (5 Cols): LIVE CHART + WHAT-IF SIMULATOR + AI STORYTELLER -->
+        <div class="lg:col-span-5 space-y-6">
+          
+          <!-- DYNAMIC CHART -->
+          <div class="glass-panel p-6 rounded-2xl space-y-4">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <i data-lucide="bar-chart-3" class="w-4 h-4 text-sikai-cyan"></i>
+                <span id="chartTitle">Pérdida de Oportunidad por Sucursal (M MXN)</span>
+              </h3>
+              <div class="flex items-center gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800 text-[11px]">
+                <button onclick="setChartType('bar')" id="chart-btn-bar" class="px-2 py-0.5 rounded bg-sikai-cyan text-black font-bold cursor-pointer">Barras</button>
+                <button onclick="setChartType('line')" id="chart-btn-line" class="px-2 py-0.5 rounded text-slate-400 hover:text-white cursor-pointer">Tendencia</button>
+              </div>
+            </div>
+            <div class="h-64 relative">
+              <canvas id="coppelAnalyticsChart"></canvas>
+            </div>
+          </div>
+
+          <!-- INTERACTIVE WHAT-IF ROI SIMULATOR -->
+          <div class="glass-panel p-6 rounded-2xl space-y-4 border border-coppel-yellow/30">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i data-lucide="sliders" class="w-4 h-4 text-coppel-yellow"></i>
+                <h3 class="text-sm font-bold text-white">Simulador Predictivo «¿Qué pasaría si...?»</h3>
+              </div>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-yellow-500/10 text-coppel-yellow border border-yellow-500/30">BigQuery ML</span>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed" id="whatif-desc">
+              Ajusta el porcentaje de clientes recurrentes (>24 meses en Tiendas Coppel) que pasan a pre-aprobación automática:
+            </p>
+            <div class="space-y-2">
+              <div class="flex justify-between text-xs font-mono">
+                <span class="text-slate-400">Cobertura de automatización: <strong class="text-white" id="whatif-pct-val">65%</strong></span>
+                <span class="text-emerald-400 font-bold" id="whatif-mxn-val">+$9.2 M MXN / quincena</span>
+              </div>
+              <input type="range" id="whatif-slider" min="10" max="100" value="65" oninput="updateWhatIf(this.value)"
+                     class="w-full accent-cyan-400 cursor-pointer h-2 bg-slate-800 rounded-lg">
+              <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+                <span>Conservador (10%)</span>
+                <span>Óptimo SIKAI (65%)</span>
+                <span>Agresivo (100%)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI DATA STORYTELLER BOX -->
+          <div class="glass-panel p-6 rounded-2xl space-y-3 border-sikai-border">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-sikai-cyan animate-pulse"></div>
+                <h3 class="text-sm font-bold text-white">AI Data Storyteller (Narrativa para Comité)</h3>
+              </div>
+              <button onclick="generateStoryteller()" class="text-xs bg-sikai-cyan/20 hover:bg-sikai-cyan/30 text-sikai-cyan px-2.5 py-1 rounded-md border border-sikai-cyan/40 transition cursor-pointer">
+                ↻ Cambiar Enfoque Ejecutivo
+              </button>
+            </div>
+            <div class="text-xs text-slate-300 leading-relaxed font-sans bg-slate-900/80 p-4 rounded-xl border border-slate-800 space-y-2" id="storytellerBox">
+              <p class="text-sikai-cyan font-semibold">📌 Resumen para Dirección de BanCoppel & Retail:</p>
+              <p>El cruce en BigQuery entre el historial de pagos en Tiendas Coppel y las solicitudes rechazadas en BanCoppel revela que <strong>7 de cada 10 rechazos recientes en Sinaloa</strong> corresponden a clientes con más de 2 años pagando puntualmente artículos de muebles y electrónica.</p>
+              <p class="text-emerald-300 font-medium">➔ Al activar la regla semántica propuesta por SIKAI, Coppel recupera $14.2 M MXN quincenales sin incrementar el índice de cartera vencida (ICV).</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: METODOLOGÍA SIKAI EN 3 FASES       -->
+    <!-- ========================================== -->
+    <section id="tab-metodologia" class="tab-content hidden space-y-8">
+      
+      <div class="glass-panel p-8 rounded-2xl text-center max-w-3xl mx-auto space-y-3">
+        <span class="text-xs font-semibold text-sikai-cyan uppercase tracking-widest px-3 py-1 rounded-full bg-sikai-cyan/10 border border-sikai-cyan/30">Nuestra Forma de Trabajar</span>
+        <h2 class="text-3xl font-extrabold text-white">«Primero Estandariza, Luego Automatiza»</h2>
+        <p class="text-slate-300 text-sm leading-relaxed">
+          No llegamos a vender herramientas complejas que nadie usará. Implementamos un método probado en 3 fases que reduce el riesgo técnico, garantiza adopción real por parte de los líderes de Coppel y entrega valor desde el primer mes.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- FASE 1 -->
+        <div class="glass-card p-6 rounded-2xl border-t-4 border-t-sikai-blue relative">
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-xs font-mono font-bold px-2.5 py-1 rounded bg-blue-500/20 text-sikai-blue border border-blue-500/30">FASE 01</span>
+            <span class="text-xs text-slate-400">Duración: 1 - 2 Semanas</span>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">Diagnóstico Profundo & Catálogo de Fuentes</h3>
+          <p class="text-xs text-slate-300 mb-4 leading-relaxed">
+            Entendemos la necesidad real del negocio antes de escribir una sola línea de código.
+          </p>
+          <ul class="space-y-2.5 text-xs text-slate-300">
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle" class="w-4 h-4 text-sikai-cyan shrink-0 mt-0.5"></i>
+              <span><strong>Mapeo de Datos en BigQuery:</strong> Identificación de tablas core en Retail, BanCoppel y Logística.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle" class="w-4 h-4 text-sikai-cyan shrink-0 mt-0.5"></i>
+              <span><strong>Entrevistas con Usuarios Clave:</strong> Detección de qué información necesitan directores y gerentes de tienda y no logran consultar hoy.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle" class="w-4 h-4 text-sikai-cyan shrink-0 mt-0.5"></i>
+              <span><strong>Definición del Caso de Éxito PoC:</strong> Selección de 1 área crítica de alto impacto para el piloto inicial.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- FASE 2 -->
+        <div class="glass-card p-6 rounded-2xl border-t-4 border-t-coppel-yellow relative">
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-xs font-mono font-bold px-2.5 py-1 rounded bg-yellow-500/20 text-coppel-yellow border border-yellow-500/30">FASE 02</span>
+            <span class="text-xs text-slate-400">Duración: 1 Semana</span>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">Plan de Trabajo & Capa Semántica Ágil</h3>
+          <p class="text-xs text-slate-300 mb-4 leading-relaxed">
+            Diseñamos la arquitectura y la gobernanza para asegurar que la IA jamás alucine ni filtre datos sensibles.
+          </p>
+          <ul class="space-y-2.5 text-xs text-slate-300">
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle" class="w-4 h-4 text-coppel-yellow shrink-0 mt-0.5"></i>
+              <span><strong>Diseño de la Capa Semántica:</strong> Diccionario de datos y metadata para que la IA comprenda la terminología interna de Coppel.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle" class="w-4 h-4 text-coppel-yellow shrink-0 mt-0.5"></i>
+              <span><strong>Control de Seguridad & Tokens:</strong> Políticas estrictas de acceso en BigQuery y control de costos de consulta en GCP.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle" class="w-4 h-4 text-coppel-yellow shrink-0 mt-0.5"></i>
+              <span><strong>Hoja de Ruta con Entregables Claros:</strong> Calendario de sprints semanales con fechas de entrega fijas.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- FASE 3 -->
+        <div class="glass-card p-6 rounded-2xl border-t-4 border-t-sikai-cyan relative">
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-xs font-mono font-bold px-2.5 py-1 rounded bg-teal-500/20 text-sikai-cyan border border-teal-500/30">FASE 03</span>
+            <span class="text-xs text-slate-400">Duración: 3 - 6 Semanas</span>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">Ejecución, Despliegue & Transferencia</h3>
+          <p class="text-xs text-slate-300 mb-4 leading-relaxed">
+            Construcción de dashboards generativos, activación del copiloto de IA y entrenamiento al equipo interno de Coppel.
+          </p>
+          <ul class="space-y-2.5 text-xs text-slate-300">
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle" class="w-4 h-4 text-sikai-cyan shrink-0 mt-0.5"></i>
+              <span><strong>Despliegue del Copiloto NL2SQL:</strong> Conexión de BigQuery con Gemini para consultas conversacionales seguras.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle" class="w-4 h-4 text-sikai-cyan shrink-0 mt-0.5"></i>
+              <span><strong>Dashboards Generativos en Looker Studio o Web:</strong> Integración del módulo de análisis explicativo automatizado.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle" class="w-4 h-4 text-sikai-cyan shrink-0 mt-0.5"></i>
+              <span><strong>Capacitación & Entrega de Manuales:</strong> Documentación completa para que los ingenieros de Coppel operen la solución con autonomía total.</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: TRAYECTORIA Y CASOS DE ÉXITO       -->
+    <!-- ========================================== -->
+    <section id="tab-casos" class="tab-content hidden space-y-8">
+      
+      <div class="glass-panel p-8 rounded-2xl max-w-4xl mx-auto space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-sikai-blue to-coppel-yellow flex items-center justify-center font-bold text-black text-xl">
+            MS
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-white">Por qué Maykol Sicard & SIKAI Consulting son el aliado ideal para Coppel</h2>
+            <p class="text-slate-400 text-xs">La unión de experiencia corporativa a gran escala y agilidad tecnológica especializada.</p>
+          </div>
+        </div>
+        <p class="text-slate-300 text-sm leading-relaxed">
+          Para implementar IA en una empresa del calibre de Coppel no basta con saber programar modelos; se necesita entender cómo opera un negocio multimillonario con millones de clientes, tiendas físicas y operaciones financieras simultáneas.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        
+        <!-- CASO 1: CGBI INMOBILIARIA -->
+        <div class="glass-card p-6 rounded-2xl space-y-4 border-l-4 border-l-sikai-cyan">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-sikai-cyan tracking-wider uppercase">PropTech & SaaS</span>
+            <span class="text-xs font-mono text-slate-400">SIKAI Software</span>
+          </div>
+          <h3 class="text-xl font-extrabold text-white">CGBI Inmobiliaria</h3>
+          <p class="text-xs font-medium text-sikai-cyan">Plataforma SaaS Multi-Tenant & Operaciones</p>
+          <ul class="space-y-2 text-xs text-slate-300">
+            <li class="flex items-start gap-2">
+              <i data-lucide="check" class="w-4 h-4 text-sikai-cyan shrink-0 mt-0.5"></i>
+              <span><strong>Gestión de Propiedades & Cartera:</strong> Seguimiento automático de cobros, contratos y estados financieros (al día / en mora).</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check" class="w-4 h-4 text-sikai-cyan shrink-0 mt-0.5"></i>
+              <span><strong>Control de Accesos Dinámico con QR:</strong> Generación y validación de códigos QR en tiempo real para residentes y visitantes.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check" class="w-4 h-4 text-sikai-cyan shrink-0 mt-0.5"></i>
+              <span><strong>Ticketing con IA:</strong> Automatización de reportes de incidencias y mantenimiento con asistentes virtuales.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- CASO 2: STOP AND GO (FEDISPETROL) -->
+        <div class="glass-card p-6 rounded-2xl space-y-4 border-l-4 border-l-coppel-yellow">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-coppel-yellow tracking-wider uppercase">Retail & Infraestructura</span>
+            <span class="text-xs font-mono text-slate-400">Alianza Estratégica</span>
+          </div>
+          <h3 class="text-xl font-extrabold text-white">Stop & Go Station (Fedispetrol)</h3>
+          <p class="text-xs font-medium text-coppel-yellow">Estructuración Comercial & Analítica de Tráfico</p>
+          <ul class="space-y-2 text-xs text-slate-300">
+            <li class="flex items-start gap-2">
+              <i data-lucide="check" class="w-4 h-4 text-coppel-yellow shrink-0 mt-0.5"></i>
+              <span><strong>Monetización de Estaciones de Servicio:</strong> Estructuración de modelos de renta modular para marcas de retail y conveniencia.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check" class="w-4 h-4 text-coppel-yellow shrink-0 mt-0.5"></i>
+              <span><strong>Analítica de Tráfico & Retorno:</strong> Algoritmos de correlación de flujo vehicular y rentabilidad esperada por metro cuadrado.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check" class="w-4 h-4 text-coppel-yellow shrink-0 mt-0.5"></i>
+              <span><strong>Pitch Interactivo Digital:</strong> Desarrollo de herramientas web ejecutivas para comités directivos de la red FEDISPETROL.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- CASO 3: SERVICENOW -->
+        <div class="glass-card p-6 rounded-2xl space-y-4 border-l-4 border-l-sikai-blue">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-sikai-blue tracking-wider uppercase">Procesos Enterprise</span>
+            <span class="text-xs font-mono text-slate-400">Reingeniería & ITSM</span>
+          </div>
+          <h3 class="text-xl font-extrabold text-white">Mapeo de Procesos ServiceNow</h3>
+          <p class="text-xs font-medium text-sikai-blue">Ingeniería Inversa de Flujos & Field Service</p>
+          <ul class="space-y-2 text-xs text-slate-300">
+            <li class="flex items-start gap-2">
+              <i data-lucide="check" class="w-4 h-4 text-sikai-blue shrink-0 mt-0.5"></i>
+              <span><strong>Levantamiento de Flujos Complejos:</strong> Extracción de scripts, UI policies y dependencias críticas en Work Order Tasks (WOT).</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check" class="w-4 h-4 text-sikai-blue shrink-0 mt-0.5"></i>
+              <span><strong>Documentación Técnica Automatizada:</strong> Generación sistemática de guías funcionales y matrices de prueba con IA.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check" class="w-4 h-4 text-sikai-blue shrink-0 mt-0.5"></i>
+              <span><strong>Eliminación de Cuellos de Botella:</strong> Rediseño de flujos para reducir reprocesos y tiempos de respuesta en soporte técnico.</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ========================================== -->
+    <!-- TAB 5: CONTACTO & REDES DE MAYKOL SICARD  -->
+    <!-- ========================================== -->
+    <section id="tab-contacto" class="tab-content hidden space-y-8">
+      
+      <div class="glass-panel p-8 rounded-2xl max-w-3xl mx-auto space-y-6 text-center">
+        
+        <div class="inline-block relative">
+          <img src="maykol_perfil.png" alt="Maykol Sicard" class="w-32 h-32 rounded-full object-cover border-2 border-sikai-cyan shadow-xl mx-auto">
+          <span class="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-emerald-500 border-2 border-slate-900 flex items-center justify-center">
+            <i data-lucide="check" class="w-3.5 h-3.5 text-black"></i>
+          </span>
+        </div>
+
+        <div class="space-y-1">
+          <h2 class="text-2xl font-extrabold text-white">Maykol Sicard</h2>
+          <p class="text-sikai-cyan text-sm font-medium">CEO & Lead Data/AI Consultant en SIKAI Consulting</p>
+          <p class="text-xs text-slate-400">Ingeniero Industrial · Especialista en Big Data, Modelos de IA & Arquitectura de Negocios</p>
+        </div>
+
+        <p class="text-xs text-slate-300 max-w-lg mx-auto leading-relaxed">
+          Disponible para acompañar a los equipos de Datos, Innovación y Transformación Digital de Grupo Coppel en México y LATAM bajo esquemas ágiles B2B.
+        </p>
+
+        <!-- SOCIAL LINKS GRID -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md mx-auto text-left text-xs">
+          
+          <a href="https://www.linkedin.com/in/maykol-sicard" target="_blank" class="glass-card p-3.5 rounded-xl flex items-center gap-3 hover:border-sikai-cyan transition">
+            <div class="w-8 h-8 rounded-lg bg-blue-600/20 text-blue-400 flex items-center justify-center">
+              <i data-lucide="linkedin" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <div class="font-bold text-white">LinkedIn Oficial</div>
+              <div class="text-slate-400 text-[11px]">in/maykol-sicard</div>
+            </div>
+          </a>
+
+          <a href="https://wa.me/573212614848?text=Hola%20Maykol,%20vi%20la%20propuesta%20de%20BigQuery%20para%20Coppel" target="_blank" class="glass-card p-3.5 rounded-xl flex items-center gap-3 hover:border-emerald-500 transition">
+            <div class="w-8 h-8 rounded-lg bg-emerald-600/20 text-emerald-400 flex items-center justify-center">
+              <i data-lucide="phone-call" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <div class="font-bold text-white">WhatsApp Directo</div>
+              <div class="text-slate-400 text-[11px]">+57 321 261 4848</div>
+            </div>
+          </a>
+
+          <a href="https://sikaiconsulting.com" target="_blank" class="glass-card p-3.5 rounded-xl flex items-center gap-3 hover:border-sikai-blue transition">
+            <div class="w-8 h-8 rounded-lg bg-sikai-blue/20 text-sikai-blue flex items-center justify-center">
+              <i data-lucide="globe" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <div class="font-bold text-white">Sitio Web Oficial</div>
+              <div class="text-slate-400 text-[11px]">sikaiconsulting.com</div>
+            </div>
+          </a>
+
+          <a href="https://www.youtube.com/@maykolsicard" target="_blank" class="glass-card p-3.5 rounded-xl flex items-center gap-3 hover:border-red-500 transition">
+            <div class="w-8 h-8 rounded-lg bg-red-600/20 text-red-400 flex items-center justify-center">
+              <i data-lucide="youtube" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <div class="font-bold text-white">Canal & Podcast</div>
+              <div class="text-slate-400 text-[11px]">youtube.com/@maykolsicard</div>
+            </div>
+          </a>
+
+        </div>
+
+        <div class="pt-4 border-t border-slate-800/80 text-xs text-slate-400 font-mono">
+          <span>Correo corporativo: </span>
+          <a href="mailto:maykol.sicard27@gmail.com" class="text-sikai-cyan hover:underline">maykol.sicard27@gmail.com</a>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-900 bg-black/60 py-6 mt-12 text-xs text-slate-500 text-center">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span>© 2026 SIKAI Consulting · Propuesta Confidencial para Grupo Coppel</span>
+      </div>
+      <div class="flex items-center gap-4 text-slate-400">
+        <span>GCP Partner Ecosystem</span>
+        <span>•</span>
+        <span>BigQuery & Gemini Certified Workflows</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- INTERACTIVE JAVASCRIPT LOGIC -->
+  <script>
+    lucide.createIcons();
+
+    let coppelChart = null;
+    let currentChartType = 'bar';
+    let currentQueryIndex = 0;
+    let storytellerAngle = 0;
+
+    const queriesDB = [
+      {
+        question: "¿Por qué cayó la colocación de crédito en Sinaloa la última quincena?",
+        dataset: "coppel_prod_lake.bancoppel_creditos",
+        stats: "⏱️ 142ms · 💾 184 MB escaneados · Cache Partition HIT",
+        chartTitle: "Oportunidad No Colocada por Sucursal en Sinaloa (M MXN)",
+        directAnswer: "<strong>Respuesta Directa:</strong> Durante los últimos 15 días, la colocación de crédito de <strong>BanCoppel en Sinaloa disminuyó un 6.8% (-$14.2 M MXN)</strong>. Los datos de BigQuery confirman que <strong>no hay caída de demanda</strong> (las solicitudes en tienda subieron +4.2%), sino que el ajuste del umbral de score crediticio aplicado el día 4 del mes rechazó automáticamente al 28% de los clientes recurrentes en <strong>Culiacán Centro, Los Mochis y Mazatlán Norte</strong>.",
+        cause: "Regla de score <code class='text-red-300'>R-402</code> elevó el corte de 620 a 665 puntos en préstamos de consumo y línea blanca.",
+        impact: "<strong>$14.2 M MXN</strong> en créditos no colocados en 15 días (concentrados 68% en Culiacán y Los Mochis).",
+        action: "Activar pre-aprobación cruzada para clientes con +24 meses de historial puntual en Tiendas Coppel.",
+        actionBtn: "Ejecutar Calibración en Motor de Riesgo",
+        baseMxn: 14.2,
+        whatIfDesc: "Ajusta el % de clientes recurrentes (>24 meses en Tiendas Coppel) que pasan a pre-aprobación automática:",
+        kpis: [
+          { label: "Colocación Quincenal", val: "$742.0 M MXN", delta: "-6.8% en Sinaloa", sub: "Desvío detectado en score regional" },
+          { label: "Oportunidad Detectada IA", val: "+$14.2 M MXN", delta: "Recuperables", sub: "Clientes puntuales >24 meses" },
+          { label: "Tiempo de Diagnóstico", val: "142 ms", delta: "vs 4 días antes", sub: "Consulta directa NL2BigQuery" },
+          { label: "Bytes Escaneados", val: "184 MB", delta: "-89% costo GCP", sub: "Partición por fecha_corte" }
+        ],
+        tableHead: ["Sucursal / Región", "Solicitudes", "Tasa Aprobación", "Monto No Colocado", "Estado IA"],
+        tableRows: [
+          ["Los Mochis Centro", "4,820", "<span class='text-red-400'>51.2% (-14%)</span>", "<strong class='text-coppel-yellow'>$4.5 M MXN</strong>", "<span class='px-2 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30 text-[10px]'>Crítico</span>"],
+          ["Culiacán Centro", "6,190", "<span class='text-red-400'>53.8% (-11%)</span>", "<strong class='text-coppel-yellow'>$4.2 M MXN</strong>", "<span class='px-2 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30 text-[10px]'>Crítico</span>"],
+          ["Guasave Norte", "3,110", "<span class='text-amber-400'>58.4% (-7%)</span>", "<strong class='text-coppel-yellow'>$2.8 M MXN</strong>", "<span class='px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px]'>Alerta</span>"],
+          ["Mazatlán Norte", "2,890", "<span class='text-amber-400'>60.1% (-6%)</span>", "<strong class='text-coppel-yellow'>$1.8 M MXN</strong>", "<span class='px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px]'>Alerta</span>"],
+          ["Navolato", "1,540", "<span class='text-emerald-400'>66.9% (-1%)</span>", "$0.9 M MXN", "<span class='px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px]'>Estable</span>"]
+        ],
+        sql: `SELECT 
+    sucursal_region, 
+    COUNT(solicitud_id) AS total_solicitudes,
+    ROUND(AVG(tasa_aprobacion), 2) AS pct_aprobacion,
+    SUM(monto_rechazado_mxn) AS perdida_oportunidad_mxn
+FROM \`coppel_prod_lake.bancoppel_creditos\`
+WHERE estado = 'Sinaloa' 
+  AND fecha_corte BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 15 DAY) AND CURRENT_DATE()
+GROUP BY 1
+ORDER BY perdida_oportunidad_mxn DESC
+LIMIT 5;`,
+        chartLabels: ["Los Mochis", "Culiacán Centro", "Guasave", "Mazatlán Norte", "Navolato"],
+        chartData: [4.5, 4.2, 2.8, 1.8, 0.9],
+        storyteller: "<p class='text-sikai-cyan font-semibold'>📌 Resumen para Comité de Crédito BanCoppel:</p><p>El cruce en BigQuery entre el historial de pagos en Tiendas Coppel y las solicitudes rechazadas en BanCoppel revela que <strong>7 de cada 10 rechazos recientes en Sinaloa</strong> corresponden a clientes con más de 2 años pagando puntualmente artículos de muebles y electrónica.</p><p class='text-emerald-300 font-medium'>➔ Al activar la regla semántica propuesta por SIKAI, Coppel recupera $14.2 M MXN quincenales sin incrementar el índice de cartera vencida.</p>"
+      },
+      {
+        question: "¿Cuáles son las 5 tiendas con mayor riesgo de ruptura de stock en motocicletas?",
+        dataset: "coppel_prod_lake.inventarios_retail_motos",
+        stats: "⏱️ 168ms · 💾 210 MB escaneados · Clustering por categoria",
+        chartTitle: "Días de Cobertura de Inventario Restantes (Motos)",
+        directAnswer: "<strong>Respuesta Directa:</strong> Existen <strong>5 tiendas clave en Jalisco y Nuevo León</strong> con cobertura de inventario de motocicletas <strong>menor a 3.4 días</strong> (el umbral mínimo de seguridad es 7 días). El modelo de demanda en BigQuery detectó que la campaña de crédito digital de BanCoppel aceleró la velocidad de venta un <strong>+41% esta semana</strong>, generando riesgo inminente de quiebre de stock antes del sábado.",
+        cause: "Incremento del +41% en ventas financiadas de motocicletas de trabajo (150cc-200cc) no reflejado en el reabastecimiento fijo semanal.",
+        impact: "Riesgo de perder <strong>$6.8 M MXN en facturación</strong> este fin de semana si las 5 tiendas agotan piso de venta.",
+        action: "Disparar transferencia cross-docking urgente de 145 unidades desde el CEDIS Guadalajara y CEDIS Monterrey hoy.",
+        actionBtn: "Generar Orden de Reabastecimiento en SAP/ERP",
+        baseMxn: 6.8,
+        whatIfDesc: "Simula el % de reabastecimiento preventivo automático desde CEDIS regionales en menos de 24h:",
+        kpis: [
+          { label: "Ventas Retail Omnicanal", val: "$1,842.5 M MXN", delta: "+8.4% YoY", sub: "Categoría Motos liderando crecimiento" },
+          { label: "Facturación en Riesgo", val: "$6.8 M MXN", delta: "Fin de semana", sub: "En 5 tiendas con cobertura <3.5 días" },
+          { label: "Cobertura Crítica", val: "2.1 días", delta: "Tienda Zapopan", sub: "Mínimo requerido: 7.0 días" },
+          { label: "Unidades a Transferir", val: "145 motos", delta: "CEDIS GDL/MTY", sub: "Ruta optimizada disponible hoy" }
+        ],
+        tableHead: ["Tienda Coppel", "Stock Actual", "Venta Diaria", "Días Cobertura", "Prioridad IA"],
+        tableRows: [
+          ["Tienda 104 Zapopan", "19 uds", "9.0 uds/día", "<span class='text-red-400 font-bold'>2.1 días</span>", "<span class='px-2 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30 text-[10px]'>Urgente 24h</span>"],
+          ["Tienda 088 Monterrey", "24 uds", "10.0 uds/día", "<span class='text-red-400 font-bold'>2.4 días</span>", "<span class='px-2 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30 text-[10px]'>Urgente 24h</span>"],
+          ["Tienda 212 Guadalajara", "23 uds", "7.9 uds/día", "<span class='text-amber-400 font-bold'>2.9 días</span>", "<span class='px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px]'>Alta</span>"],
+          ["Tienda 045 Guadalupe", "22 uds", "7.1 uds/día", "<span class='text-amber-400 font-bold'>3.1 días</span>", "<span class='px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px]'>Alta</span>"],
+          ["Tienda 301 Tlaquepaque", "17 uds", "5.0 uds/día", "<span class='text-amber-400 font-bold'>3.4 días</span>", "<span class='px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px]'>Media</span>"]
+        ],
+        sql: `SELECT 
+    tienda_id, 
+    nombre_tienda, 
+    stock_actual_unidades,
+    tasa_venta_diaria,
+    ROUND(stock_actual_unidades / NULLIF(tasa_venta_diaria, 0), 1) AS dias_cobertura
+FROM \`coppel_prod_lake.inventarios_retail\`
+WHERE categoria = 'Motocicletas' AND stock_actual_unidades > 0
+HAVING dias_cobertura < 3.5
+ORDER BY dias_cobertura ASC
+LIMIT 5;`,
+        chartLabels: ["104 Zapopan", "088 Monterrey", "212 Guadalajara", "045 Guadalupe", "301 Tlaquepaque"],
+        chartData: [2.1, 2.4, 2.9, 3.1, 3.4],
+        storyteller: "<p class='text-sikai-cyan font-semibold'>📌 Resumen para Dirección de Cadena de Suministro & Compras:</p><p>Mientras que el promedio nacional tiene 11 días de inventario, el corredor Jalisco–Nuevo León está agotando el stock de motocicletas el doble de rápido por aprobaciones digitales desde la App Coppel.</p><p class='text-emerald-300 font-medium'>➔ El reabastecimiento predictivo automatizado evita perder $6.8 M MXN este fin de semana sin sobre-inventariar el resto del país.</p>"
+      },
+      {
+        question: "Proyecta la colocación de crédito BanCoppel para el próximo Buen Fin",
+        dataset: "coppel_prod_lake.modelo_demanda_buenfin",
+        stats: "⏱️ 210ms · 💾 410 MB escaneados · Modelo BigQuery ML ARIMA_PLUS",
+        chartTitle: "Proyección de Demanda por Categoría — Buen Fin (M MXN)",
+        directAnswer: "<strong>Respuesta Directa:</strong> El modelo predictivo ejecutado en <strong>BigQuery ML (`ARIMA_PLUS_XREG`)</strong> proyecta una colocación récord de <strong>$975.0 M MXN (+18.7% vs año anterior)</strong> durante los 4 días del Buen Fin. Las categorías de <strong>Telefonía ($320M) y Línea Blanca ($240M)</strong> concentrarán el 57% de la demanda total, con un pico crítico de solicitudes digitales entre las 11:00 y las 16:00 hrs.",
+        cause: "Base de 1.4 millones de clientes con cupo pre-autorizado en App BanCoppel e intención de compra activa en carrito digital.",
+        impact: "Potencial de colocación incremental de <strong>+$154.0 M MXN adicionales</strong> si se evita latencia en validación biométrica.",
+        action: "Pre-escalar nodos de validación biométrica +25% y activar oferta pre-aprobada 1-click en App Coppel 48h antes.",
+        actionBtn: "Activar Campaña Pre-Aprobada & Auto-Scaling",
+        baseMxn: 154.0,
+        whatIfDesc: "Simula el % de clientes pre-aprobados impactados por notificación push con crédito 1-click antes del Buen Fin:",
+        kpis: [
+          { label: "Proyección Buen Fin", val: "$975.0 M MXN", delta: "+18.7% YoY", sub: "Intervalo confianza 95% en BigQuery ML" },
+          { label: "Crecimiento Incremental", val: "+$154.0 M MXN", delta: "Nuevo Récord", sub: "Impulsado por Telefonía y Línea Blanca" },
+          { label: "Pico de Transacciones", val: "480 req/seg", delta: "11:00 - 16:00h", sub: "Requiere +25% capacidad biométrica" },
+          { label: "Conversión App 1-Click", val: "34.2%", delta: "+9.1 pts vs web", sub: "Pre-aprobación en tiempo real" }
+        ],
+        tableHead: ["Categoría Producto", "Proyección MXN", "Crecimiento YoY", "Canal Dominante", "Confianza ML"],
+        tableRows: [
+          ["Telefonía & Smartphones", "$320.0 M MXN", "<span class='text-emerald-400 font-bold'>+22.4%</span>", "App Coppel (64%)", "<span class='px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px]'>96.4%</span>"],
+          ["Línea Blanca & Hogar", "$240.0 M MXN", "<span class='text-emerald-400 font-bold'>+17.1%</span>", "Tienda Física (58%)", "<span class='px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px]'>95.1%</span>"],
+          ["Motocicletas & Movilidad", "$180.0 M MXN", "<span class='text-emerald-400 font-bold'>+24.8%</span>", "Omnicanal (50/50)", "<span class='px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px]'>94.0%</span>"],
+          ["Muebles & Colchones", "$140.0 M MXN", "<span class='text-emerald-400 font-bold'>+12.3%</span>", "Tienda Física (71%)", "<span class='px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px]'>93.8%</span>"],
+          ["Moda & Calzado", "$95.0 M MXN", "<span class='text-emerald-400 font-bold'>+14.0%</span>", "App Coppel (55%)", "<span class='px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px]'>95.5%</span>"]
+        ],
+        sql: `SELECT 
+    categoria_producto,
+    ROUND(prediccion_monto_mxn, 1) AS prediccion_mxn,
+    ROUND(crecimiento_yoy_pct, 1) AS yoy_pct,
+    ROUND(confianza_modelo * 100, 1) AS confianza_pct
+FROM ML.PREDICT(MODEL \`coppel_prod_lake.modelo_demanda_buenfin\`,
+  (SELECT * FROM \`coppel_prod_lake.features_temporada_q4\`))
+ORDER BY prediccion_mxn DESC;`,
+        chartLabels: ["Telefonía", "Línea Blanca", "Motos", "Muebles", "Moda"],
+        chartData: [320, 240, 180, 140, 95],
+        storyteller: "<p class='text-sikai-cyan font-semibold'>📌 Resumen para Comité Ejecutivo (Buen Fin):</p><p>El modelo en BigQuery ML anticipa que el cuello de botella no será el fondeo crediticio, sino el tiempo de respuesta en cajas y validación biométrica móvil al mediodía.</p><p class='text-emerald-300 font-medium'>➔ Preparar las ofertas pre-aprobadas de 1-click en la App reduce un 38% la fila en sucursales físicas.</p>"
+      },
+      {
+        question: "¿Qué segmentos presentan alerta de mora temprana y cómo prevenir cartera vencida?",
+        dataset: "coppel_prod_lake.riesgo_cobranza_preventiva",
+        stats: "⏱️ 155ms · 💾 260 MB escaneados · Modelo Propensión Pago",
+        chartTitle: "Cartera en Riesgo Preventivo por Cohorte (M MXN)",
+        directAnswer: "<strong>Respuesta Directa:</strong> El motor de analítica preventiva identificó <strong>$38.4 M MXN en créditos con probabilidad alta (>72%) de caer en atraso de primer pago</strong> en los próximos 7 días. El 61% se concentra en clientes primerizos de 18 a 25 años cuyo día de corte no coincide con su quincena de nómina.",
+        cause: "Desfase entre la fecha de pago programada (día 10) y la dispersión real de nómina (día 15) en 42,000 cuentas nuevas.",
+        impact: "Potencial contención de <strong>$24.5 M MXN en cartera sana</strong> evitando que pasen a cobranza correctiva.",
+        action: "Enviar recordatorio conversacional por WhatsApp con opción de ajuste flexible de fecha de pago sin penalización.",
+        actionBtn: "Lanzar Flujo Preventivo en WhatsApp / SIKAI CX",
+        baseMxn: 24.5,
+        whatIfDesc: "Simula el % de cuentas en riesgo contactadas proactivamente por el agente conversacional SIKAI CX:",
+        kpis: [
+          { label: "Cartera Analizada IA", val: "$4,120 M MXN", delta: "Tiempo Real", sub: "Scoring diario sobre BigQuery" },
+          { label: "Mora Prevenible (7d)", val: "$24.5 M MXN", delta: "-3.1 pts ICV", sub: "Con recordatorio inteligente WhatsApp" },
+          { label: "Tasa Respuesta Bot", val: "68.4%", delta: "vs 14% llamada", sub: "Autogestión de promesa de pago" },
+          { label: "Ahorro Operativo", val: "-42% costo", delta: "Contact Center", sub: "Menos llamadas manuales repetitivas" }
+        ],
+        tableHead: ["Segmento / Cohorte", "Cuentas", "Riesgo Atraso 7d", "Monto Expuesto", "Acción IA"],
+        tableRows: [
+          ["Primer Crédito 18-25 años", "18,400", "<span class='text-red-400 font-bold'>78.2%</span>", "<strong class='text-coppel-yellow'>$14.8 M MXN</strong>", "<span class='px-2 py-0.5 rounded bg-sikai-cyan/20 text-sikai-cyan border border-sikai-cyan/30 text-[10px]'>Re-agendar Corte</span>"],
+          ["Microcrédito Digital App", "12,300", "<span class='text-red-400 font-bold'>71.5%</span>", "<strong class='text-coppel-yellow'>$9.6 M MXN</strong>", "<span class='px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px]'>WhatsApp 1-Click</span>"],
+          ["Consumo Electrodomésticos", "8,900", "<span class='text-amber-400 font-bold'>54.0%</span>", "$6.4 M MXN", "<span class='px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px]'>Notificación Push</span>"],
+          ["Préstamo Personal Efectivo", "6,210", "<span class='text-amber-400 font-bold'>49.8%</span>", "$4.7 M MXN", "<span class='px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px]'>Domiciliación</span>"],
+          ["Recurrentes +12 meses", "4,100", "<span class='text-emerald-400 font-bold'>21.4%</span>", "$2.9 M MXN", "<span class='px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px]'>Monitoreo</span>"]
+        ],
+        sql: `SELECT 
+    segmento_cliente,
+    COUNT(cuenta_id) AS cuentas_en_riesgo,
+    ROUND(AVG(probabilidad_atraso_7d) * 100, 1) AS pct_riesgo,
+    ROUND(SUM(saldo_expuesto_mxn) / 1e6, 1) AS monto_expuesto_mmxn
+FROM \`coppel_prod_lake.riesgo_cobranza_preventiva\`
+WHERE probabilidad_atraso_7d > 0.45
+GROUP BY 1
+ORDER BY monto_expuesto_mmxn DESC;`,
+        chartLabels: ["Primer Crédito 18-25", "Microcrédito App", "Electrodomésticos", "Préstamo Efectivo", "Recurrentes +12m"],
+        chartData: [14.8, 9.6, 6.4, 4.7, 2.9],
+        storyteller: "<p class='text-sikai-cyan font-semibold'>📌 Resumen para Dirección de Riesgo & Cobranza:</p><p>Así como implementamos seguimiento automatizado de cartera en CGBI, en BanCoppel la IA detecta qué clientes no fallan por falta de solvencia sino por desfase de 5 días con su fecha de quincena.</p><p class='text-emerald-300 font-medium'>➔ Ofrecer el ajuste automático por WhatsApp preserva $24.5 M MXN en cartera vigente.</p>"
+      },
+      {
+        question: "¿Dónde están los cuellos de botella logísticos en CEDIS y entregas de última milla?",
+        dataset: "coppel_prod_lake.logistica_cedis_sla",
+        stats: "⏱️ 134ms · 💾 195 MB escaneados · Tiempo Real",
+        chartTitle: "Pedidos con Riesgo de Retraso >48h por CEDIS",
+        directAnswer: "<strong>Respuesta Directa:</strong> El monitoreo sobre BigQuery detecta que el <strong>SLA nacional de entrega es de 94.8%</strong>, pero el <strong>CEDIS Guadalajara presenta una saturación del 92% en andenes de muebles y línea blanca</strong>, poniendo en riesgo de retraso (>48h) a <strong>3,200 pedidos de clientes</strong> si no se rebalancea la carga hoy.",
+        cause: "Acumulación de 38 rutas de gran volumen en CEDIS Guadalajara tras cierre temporal de autopista regional.",
+        impact: "Posible afectación a <strong>3,200 entregas programadas ($11.4 M MXN)</strong> y aumento de tickets de reclamo en Contact Center.",
+        action: "Ruteo dinámico alterno vía CEDIS Querétaro / León y notificación proactiva de ventana horaria al cliente.",
+        actionBtn: "Activar Re-ruteo Dinámico en WMS / ServiceNow",
+        baseMxn: 11.4,
+        whatIfDesc: "Simula el % de órdenes re-ruteadas automáticamente hacia nodos alternos y flota dedicada:",
+        kpis: [
+          { label: "Cumplimiento SLA Nacional", val: "94.8% SLA", delta: "+1.9% MoM", sub: "Meta corporativa Coppel: 95.0%" },
+          { label: "Pedidos en Riesgo 48h", val: "3,200 envíos", delta: "CEDIS Guadalajara", sub: "Muebles y refrigeradores" },
+          { label: "Ahorro en Reclamos", val: "-64% tickets", delta: "Notificación IA", sub: "Aviso proactivo por WhatsApp" },
+          { label: "Tiempo Re-asignación", val: "8 seg", delta: "Automático", sub: "Integrado con ServiceNow / WMS" }
+        ],
+        tableHead: ["Nodo Logístico CEDIS", "Ocupación Andén", "Pedidos en Riesgo", "SLA Actual", "Estado Operativo"],
+        tableRows: [
+          ["CEDIS Guadalajara", "92.4%", "<span class='text-red-400 font-bold'>1,480 pedidos</span>", "87.2% SLA", "<span class='px-2 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30 text-[10px]'>Re-ruteo Urgente</span>"],
+          ["CEDIS Monterrey", "84.1%", "<span class='text-amber-400 font-bold'>720 pedidos</span>", "91.8% SLA", "<span class='px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px]'>Atención</span>"],
+          ["CEDIS Azcapotzalco CDMX", "81.0%", "<span class='text-amber-400 font-bold'>540 pedidos</span>", "93.4% SLA", "<span class='px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px]'>Estable</span>"],
+          ["CEDIS Culiacán", "73.5%", "260 pedidos", "96.8% SLA", "<span class='px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px]'>Óptimo</span>"],
+          ["CEDIS Querétaro (Alterno)", "64.2%", "200 pedidos", "97.5% SLA", "<span class='px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px]'>Capacidad Libre</span>"]
+        ],
+        sql: `SELECT 
+    nodo_cedis,
+    ROUND(ocupacion_anden_pct, 1) AS ocupacion_pct,
+    COUNTIF(riesgo_retraso_48h = TRUE) AS pedidos_en_riesgo,
+    ROUND(AVG(cumplimiento_sla) * 100, 1) AS sla_pct
+FROM \`coppel_prod_lake.logistica_cedis_sla\`
+WHERE fecha_operacion = CURRENT_DATE()
+GROUP BY 1
+ORDER BY pedidos_en_riesgo DESC;`,
+        chartLabels: ["CEDIS GDL", "CEDIS MTY", "CEDIS CDMX", "CEDIS Culiacán", "CEDIS Querétaro"],
+        chartData: [1480, 720, 540, 260, 200],
+        storyteller: "<p class='text-sikai-cyan font-semibold'>📌 Resumen para Operaciones & Logística:</p><p>El CEDIS Querétaro cuenta con un 35.8% de capacidad disponible en andenes hoy, lo que permite absorber el desborde de Guadalajara en rutas del Bajío y Occidente.</p><p class='text-emerald-300 font-medium'>➔ Automatizar la orden de trabajo en ServiceNow / WMS protege la promesa de entrega en 24 horas.</p>"
+      },
+      {
+        question: "Compara la conversión omnicanal entre la App Coppel y las tiendas físicas este mes",
+        dataset: "coppel_prod_lake.omnicanal_embudo_ventas",
+        stats: "⏱️ 149ms · 💾 230 MB escaneados · Atribución Omnicanal",
+        chartTitle: "Ingresos por Modalidad de Compra Omnicanal (M MXN)",
+        directAnswer: "<strong>Respuesta Directa:</strong> El análisis de atribución en BigQuery demuestra que los clientes omnicanal (que cotizan en <strong>App Coppel y recogen o financian en tienda física</strong>) tienen un <strong>ticket promedio 38% superior ($4,890 MXN vs $3,540 MXN)</strong>. Sin embargo, el 22% de los carritos abandonados en la App ocurren en el paso de validación de crédito.",
+        cause: "Fricción en el paso 3 del checkout móvil cuando el usuario solicita ampliación de línea de crédito BanCoppel.",
+        impact: "Recuperar el 35% de esos carritos abandonados representa <strong>+$28.6 M MXN mensuales</strong> en ventas netas.",
+        action: "Habilitar QR de 'Continuar compra asistida en Kiosco/Tienda' o aprobación instantánea con biometría facial.",
+        actionBtn: "Activar Flujo Omnicanal QR en App & Tiendas",
+        baseMxn: 28.6,
+        whatIfDesc: "Simula el % de carritos abandonados en App que se recuperan con asistencia omnicanal y QR en tienda:",
+        kpis: [
+          { label: "Ticket Omnicanal", val: "$4,890 MXN", delta: "+38% vs 1 canal", sub: "Clientes que usan App + Tienda" },
+          { label: "Carritos Recuperables", val: "+$28.6 M MXN", delta: "Mensuales", sub: "Reduciendo fricción en checkout" },
+          { label: "Conversión Click & Collect", val: "41.8%", delta: "+12.4% YoY", sub: "Retiro en tienda impulsa venta cruzada" },
+          { label: "Recompra a 60 días", val: "64.0%", delta: "Top Fidelidad", sub: "Mayor retención del ecosistema Coppel" }
+        ],
+        tableHead: ["Modalidad Omnicanal", "Transacciones", "Ticket Promedio", "Conversión", "Ventas Mes MXN"],
+        tableRows: [
+          ["App Coppel + Retiro en Tienda", "142,500", "$4,890 MXN", "<span class='text-emerald-400 font-bold'>41.8%</span>", "<strong class='text-coppel-yellow'>$696.8 M MXN</strong>"],
+          ["Tienda Física c/ Crédito Digital", "198,200", "$4,120 MXN", "<span class='text-emerald-400 font-bold'>38.4%</span>", "<strong class='text-coppel-yellow'>$816.5 M MXN</strong>"],
+          ["App Coppel Envío Domicilio", "94,100", "$3,750 MXN", "<span class='text-amber-400 font-bold'>24.2%</span>", "$352.8 M MXN"],
+          ["Web Desktop E-commerce", "48,900", "$3,540 MXN", "<span class='text-amber-400 font-bold'>19.8%</span>", "$173.1 M MXN"],
+          ["Carrito Abandonado (Oportunidad)", "61,400", "$4,650 MXN", "<span class='text-red-400 font-bold'>En Pausa</span>", "<span class='text-sikai-cyan font-bold'>+$28.6 M Recuperables</span>"]
+        ],
+        sql: `SELECT 
+    modalidad_omnicanal,
+    COUNT(DISTINCT orden_id) AS transacciones,
+    ROUND(AVG(ticket_mxn), 0) AS ticket_promedio_mxn,
+    ROUND(AVG(tasa_conversion) * 100, 1) AS conversion_pct,
+    ROUND(SUM(monto_total_mxn) / 1e6, 1) AS ventas_mmxn
+FROM \`coppel_prod_lake.omnicanal_embudo_ventas\`
+WHERE mes_operacion = DATE_TRUNC(CURRENT_DATE(), MONTH)
+GROUP BY 1
+ORDER BY ventas_mmxn DESC;`,
+        chartLabels: ["Tienda c/ App", "Click & Collect", "Envío App", "Web Desktop", "Recuperable IA"],
+        chartData: [816.5, 696.8, 352.8, 173.1, 285.5],
+        storyteller: "<p class='text-sikai-cyan font-semibold'>📌 Resumen para Dirección E-Commerce & Omnicanalidad:</p><p>Cuando un cliente de Coppel inicia su búsqueda en la App y recoge en tienda con código QR (similar a la tecnología implementada por SIKAI en CGBI), el ticket crece un 38% por compras adicionales en piso.</p><p class='text-emerald-300 font-medium'>➔ Conectar los carritos en pausa con asesores de tienda genera +$28.6 M MXN al mes.</p>"
+      }
+    ];
+
+    // Custom dynamic generator for ANY free-text question typed by the user!
+    function buildDynamicCustomResponse(userQuestion) {
+      const cleanQ = userQuestion.trim();
+      const safeSqlComment = cleanQ.replace(/['"`]/g, '');
+      return {
+        question: cleanQ,
+        dataset: "coppel_prod_lake.analytics_unificado_ia",
+        stats: "⏱️ 158ms · 💾 192 MB escaneados · Generado en Vivo por Gemini 2.0",
+        chartTitle: "Impacto Estimado por Región para tu Consulta (M MXN)",
+        directAnswer: `<strong>Respuesta Ejecutiva Generada en Vivo:</strong> Al analizar en <strong>Google BigQuery</strong> tu consulta (<em>«${cleanQ}»</em>), el motor semántico de SIKAI cruzó los registros recientes de <strong>Tiendas Coppel, BanCoppel y CEDIS</strong>. Se identifica una oportunidad inmediata de optimización de <strong>+$18.4 M MXN mensuales</strong> concentrada en las regiones Noroeste y Occidente, donde la automatización de reglas operativas reduce un <strong>34% los tiempos de respuesta</strong> sin requerir desarrollos manuales de TI.`,
+        cause: "Fricción operativa detectada al cruzar particiones transaccionales en tiempo real sobre BigQuery.",
+        impact: "Oportunidad cuantificada en <strong>+$18.4 M MXN</strong> y reducción del 34% en reprocesos operativos.",
+        action: "Desplegar flujo automatizado SIKAI (Quick Win de 3 semanas) conectado directamente a este indicador.",
+        actionBtn: "Ejecutar Piloto Quick Win sobre este Proceso",
+        baseMxn: 18.4,
+        whatIfDesc: "Simula el impacto financiero al automatizar este proceso con la metodología SIKAI:",
+        kpis: [
+          { label: "Impacto Estimado IA", val: "+$18.4 M MXN", delta: "+14.2% mejora", sub: "Calculado sobre partición actual" },
+          { label: "Eficiencia Operativa", val: "-34% tiempo", delta: "Automatizado", sub: "Eliminación de cuellos de botella" },
+          { label: "Latencia BigQuery", val: "158 ms", delta: "Tiempo real", sub: "GoogleSQL generado sin intervención TI" },
+          { label: "Tiempo de Implementación", val: "3 Semanas", delta: "Quick Win SIKAI", sub: "Primero Estandariza, Luego Automatiza" }
+        ],
+        tableHead: ["Región / Unidad Coppel", "Volumen Analizado", "Variación Detectada", "Oportunidad MXN", "Recomendación IA"],
+        tableRows: [
+          ["Región Noroeste (Culiacán/Mochis)", "48,920 reg", "<span class='text-emerald-400 font-bold'>+16.4% potencial</span>", "<strong class='text-coppel-yellow'>$6.2 M MXN</strong>", "<span class='px-2 py-0.5 rounded bg-sikai-cyan/20 text-sikai-cyan border border-sikai-cyan/30 text-[10px]'>Prioridad 1</span>"],
+          ["Región Occidente (Guadalajara)", "41,300 reg", "<span class='text-emerald-400 font-bold'>+14.8% potencial</span>", "<strong class='text-coppel-yellow'>$4.8 M MXN</strong>", "<span class='px-2 py-0.5 rounded bg-sikai-cyan/20 text-sikai-cyan border border-sikai-cyan/30 text-[10px]'>Prioridad 1</span>"],
+          ["Región Norte (Monterrey)", "38,750 reg", "<span class='text-amber-400 font-bold'>+11.2% potencial</span>", "<strong class='text-coppel-yellow'>$3.5 M MXN</strong>", "<span class='px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px]'>Prioridad 2</span>"],
+          ["Región Centro (CDMX/EDOMEX)", "52,100 reg", "<span class='text-amber-400 font-bold'>+9.5% potencial</span>", "$2.4 M MXN", "<span class='px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px]'>Prioridad 2</span>"],
+          ["Región Bajío (Querétaro/León)", "24,600 reg", "<span class='text-emerald-400 font-bold'>+8.1% potencial</span>", "$1.5 M MXN", "<span class='px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px]'>Óptimo</span>"]
+        ],
+        sql: `-- Consulta GoogleSQL generada dinámicamente por SIKAI Semantic Layer (Gemini 2.0)
+-- Pregunta original: "${safeSqlComment}"
+SELECT 
+    region_operativa,
+    COUNT(transaccion_id) AS volumen_analizado,
+    ROUND(AVG(score_eficiencia_ia) * 100, 1) AS mejora_potencial_pct,
+    ROUND(SUM(impacto_estimado_mxn) / 1e6, 1) AS oportunidad_mmxn
+FROM \`coppel_prod_lake.analytics_unificado_ia\`
+WHERE fecha_particion >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)
+GROUP BY 1
+ORDER BY oportunidad_mmxn DESC
+LIMIT 5;`,
+        chartLabels: ["Noroeste", "Occidente", "Norte", "Centro CDMX", "Bajío"],
+        chartData: [6.2, 4.8, 3.5, 2.4, 1.5],
+        storyteller: `<p class='text-sikai-cyan font-semibold'>📌 Síntesis Personalizada para tu Consulta:</p><p>Para responder a <em>«${cleanQ}»</em> sin esperar días por un reporte manual, la capa semántica de SIKAI traduce la intención de negocio a GoogleSQL optimizado y cruza los indicadores clave en milisegundos.</p><p class='text-emerald-300 font-medium'>➔ Este mismo flujo puede conectarse en 3 semanas sobre las tablas reales de Grupo Coppel.</p>`
+      };
+    }
+
+    // Tab Switching
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-sikai-cyan', 'text-black', 'font-semibold');
+        btn.classList.add('text-slate-400');
+      });
+
+      const selectedContent = document.getElementById('tab-' + tabId);
+      const selectedBtn = document.getElementById('tab-btn-' + tabId);
+
+      if (selectedContent) selectedContent.classList.remove('hidden');
+      if (selectedBtn) {
+        selectedBtn.classList.add('bg-sikai-cyan', 'text-black', 'font-semibold');
+        selectedBtn.classList.remove('text-slate-400');
+      }
+
+      if (tabId === 'poc') {
+        setTimeout(() => {
+          if (!coppelChart) {
+            initChart();
+          } else {
+            coppelChart.resize();
+          }
+        }, 60);
+      }
+    }
+
+    function switchEvidenceTab(which) {
+      const tContainer = document.getElementById('evidence-table-container');
+      const sContainer = document.getElementById('evidence-sql-container');
+      const bTable = document.getElementById('ev-btn-table');
+      const bSql = document.getElementById('ev-btn-sql');
+
+      if (which === 'table') {
+        tContainer.classList.remove('hidden');
+        sContainer.classList.add('hidden');
+        bTable.className = 'px-3 py-1.5 rounded-lg font-bold bg-sikai-cyan text-black transition cursor-pointer';
+        bSql.className = 'px-3 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white transition cursor-pointer';
+      } else {
+        tContainer.classList.add('hidden');
+        sContainer.classList.remove('hidden');
+        bSql.className = 'px-3 py-1.5 rounded-lg font-bold bg-sikai-cyan text-black transition cursor-pointer';
+        bTable.className = 'px-3 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white transition cursor-pointer';
+      }
+    }
+
+    function highlightChip(activeIdx) {
+      for (let i = 0; i < 6; i++) {
+        const el = document.getElementById('chip-' + i);
+        if (!el) continue;
+        if (i === activeIdx) {
+          el.className = "scenario-chip px-3 py-1.5 rounded-lg bg-sikai-cyan/20 text-sikai-cyan border border-sikai-cyan/50 font-semibold transition cursor-pointer";
+        } else {
+          el.className = "scenario-chip px-3 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer";
+        }
+      }
+    }
+
+    function setQuery(index) {
+      const q = queriesDB[index];
+      document.getElementById('nlQueryInput').value = q.question;
+      executeNLQuery(index);
+    }
+
+    function executeNLQuery(forcedIndex = null) {
+      const inputEl = document.getElementById('nlQueryInput');
+      const rawText = (inputEl.value || '').trim();
+      let selectedObj = null;
+      let matchedIndex = forcedIndex;
+
+      if (matchedIndex === null) {
+        const lower = rawText.toLowerCase();
+        // Check if it matches one of the 6 preloaded questions or keywords
+        const exactIdx = queriesDB.findIndex(item => item.question.toLowerCase() === lower);
+        if (exactIdx !== -1) {
+          matchedIndex = exactIdx;
+        } else if (lower.includes('sinaloa') || lower.includes('colocación') || lower.includes('colocacion') || lower.includes('cayó')) {
+          matchedIndex = 0;
+        } else if (lower.includes('moto') || lower.includes('stock') || lower.includes('ruptura') || lower.includes('inventario')) {
+          matchedIndex = 1;
+        } else if (lower.includes('buen fin') || lower.includes('proyect') || lower.includes('predic')) {
+          matchedIndex = 2;
+        } else if (lower.includes('mora') || lower.includes('cobranza') || lower.includes('vencida') || lower.includes('atraso')) {
+          matchedIndex = 3;
+        } else if (lower.includes('cedis') || lower.includes('logístic') || lower.includes('logistic') || lower.includes('entrega') || lower.includes('envío')) {
+          matchedIndex = 4;
+        } else if (lower.includes('omnicanal') || lower.includes('app') || lower.includes('carrito') || lower.includes('conversión')) {
+          matchedIndex = 5;
+        }
+      }
+
+      if (matchedIndex !== null && queriesDB[matchedIndex]) {
+        currentQueryIndex = matchedIndex;
+        selectedObj = queriesDB[matchedIndex];
+        highlightChip(matchedIndex);
+      } else {
+        currentQueryIndex = -1;
+        selectedObj = buildDynamicCustomResponse(rawText || "¿Cuál es la principal oportunidad de mejora hoy en Coppel?");
+        highlightChip(-1);
+      }
+
+      // Visual loading feedback on button & pipeline bar
+      const btn = document.getElementById('btn-execute-query');
+      const pill = document.getElementById('copilot-status-pill');
+      const card = document.getElementById('nl-response-card');
+      const p1 = document.getElementById('pipe-step-1');
+      const p2 = document.getElementById('pipe-step-2');
+      const p3 = document.getElementById('pipe-step-3');
+
+      btn.innerHTML = '<span>⏳ Consultando BigQuery...</span>';
+      pill.innerText = '⚡ Ejecutando Gemini 2.0 + BigQuery...';
+      pill.className = 'text-[11px] font-mono px-2.5 py-1 bg-amber-500/20 rounded-full border border-amber-500/40 text-coppel-yellow animate-pulse';
+      card.style.opacity = '0.55';
+
+      p1.innerHTML = '<span class="text-coppel-yellow animate-pulse">● 1. Analizando intención semántica...</span>';
+      p2.innerHTML = '<span class="text-slate-500">○ 2. Generando GoogleSQL...</span>';
+      p3.innerHTML = '<span class="text-slate-500">○ 3. Sintetizando respuesta...</span>';
+
+      setTimeout(() => {
+        p1.innerHTML = '<span>✓ 1. Intención Semántica OK</span>';
+        p2.innerHTML = '<span class="text-coppel-yellow animate-pulse">● 2. Escaneando partición BigQuery...</span>';
+      }, 180);
+
+      setTimeout(() => {
+        // Populate all fields
+        p2.innerHTML = '<span>✓ 2. GoogleSQL Ejecutado</span>';
+        p3.innerHTML = '<span>✓ 3. Respuesta en Lenguaje Natural Lista</span>';
+        btn.innerHTML = '<i data-lucide="sparkles" class="w-4 h-4"></i><span>Generar Respuesta IA</span>';
+        pill.innerText = '● Respuesta generada en vivo';
+        pill.className = 'text-[11px] font-mono px-2.5 py-1 bg-emerald-500/15 rounded-full border border-emerald-500/40 text-emerald-300';
+        card.style.opacity = '1';
+
+        document.getElementById('active-dataset-badge').innerText = selectedObj.dataset;
+        document.getElementById('nl-question-echo').innerText = 'Análisis para: «' + selectedObj.question + '»';
+        document.getElementById('sql-perf-stats').innerText = selectedObj.stats;
+        document.getElementById('nlDirectAnswer').innerHTML = selectedObj.directAnswer;
+        document.getElementById('insight-cause').innerHTML = selectedObj.cause;
+        document.getElementById('insight-impact').innerHTML = selectedObj.impact;
+        document.getElementById('insight-action').innerHTML = selectedObj.action;
+        document.getElementById('btn-trigger-label').innerText = selectedObj.actionBtn;
+        document.getElementById('action-status-text').innerHTML = 'Flujo de automatización SIKAI listo para ejecutar esta recomendación.';
+        document.getElementById('sql-target-table').innerText = 'Tabla: ' + selectedObj.dataset;
+        document.getElementById('sqlOutput').innerText = selectedObj.sql;
+        document.getElementById('chartTitle').innerText = selectedObj.chartTitle;
+        document.getElementById('storytellerBox').innerHTML = selectedObj.storyteller;
+        document.getElementById('whatif-desc').innerText = selectedObj.whatIfDesc;
+
+        // Update KPIs
+        selectedObj.kpis.forEach((k, idx) => {
+          const n = idx + 1;
+          const lEl = document.getElementById('kpi-label-' + n);
+          const vEl = document.getElementById('kpi-val-' + n);
+          const dEl = document.getElementById('kpi-delta-' + n);
+          const sEl = document.getElementById('kpi-sub-' + n);
+          if (lEl) lEl.innerText = k.label;
+          if (vEl) vEl.innerText = k.val;
+          if (dEl) dEl.innerText = k.delta;
+          if (sEl) sEl.innerText = k.sub;
+        });
+
+        // Update Table Head & Rows
+        const thead = document.getElementById('bq-table-head');
+        thead.innerHTML = selectedObj.tableHead.map(h => `<th class="py-2.5 px-3">${h}</th>`).join('');
+        const tbody = document.getElementById('bq-table-body');
+        tbody.innerHTML = selectedObj.tableRows.map(row => `
+          <tr class="hover:bg-slate-900/60 transition">
+            ${row.map((cell, ci) => `<td class="py-2.5 px-3 ${ci === 0 ? 'font-semibold text-white' : 'font-mono'}">${cell}</td>`).join('')}
+          </tr>
+        `).join('');
+
+        // Reset What-If slider
+        window.currentBaseMxn = selectedObj.baseMxn || 14.2;
+        document.getElementById('whatif-slider').value = 65;
+        updateWhatIf(65);
+
+        // Update Chart
+        updateChart(selectedObj.chartLabels, selectedObj.chartData);
+        lucide.createIcons();
+      }, 380);
+    }
+
+    function updateWhatIf(val) {
+      const base = window.currentBaseMxn || 14.2;
+      const pct = parseInt(val, 10);
+      const calc = ((base * pct) / 100).toFixed(1);
+      document.getElementById('whatif-pct-val').innerText = pct + '%';
+      document.getElementById('whatif-mxn-val').innerText = '+$' + calc + ' M MXN recuperados';
+    }
+
+    function triggerAutomatedAction() {
+      const statusEl = document.getElementById('action-status-text');
+      const btn = document.getElementById('btn-trigger-action');
+      statusEl.innerHTML = '<span class="text-sikai-cyan font-semibold">✓ Ticket de automatización #SIKAI-894 creado y enviado al flujo operativo de Coppel en 120ms.</span>';
+      btn.className = 'bg-sikai-cyan text-black font-extrabold px-4 py-2 rounded-xl text-xs transition flex items-center gap-1.5 shadow-md cursor-pointer';
+      document.getElementById('btn-trigger-label').innerText = '✓ Automatización Ejecutada con Éxito';
+    }
+
+    function copySQL() {
+      const sql = document.getElementById('sqlOutput').innerText;
+      navigator.clipboard.writeText(sql);
+      const btn = document.getElementById('btn-copy-sql');
+      btn.innerText = '✓ SQL Copiado';
+      setTimeout(() => { btn.innerText = '📋 Copiar GoogleSQL'; }, 1800);
+    }
+
+    function initChart() {
+      const canvas = document.getElementById('coppelAnalyticsChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (coppelChart) coppelChart.destroy();
+      const q = queriesDB[currentQueryIndex >= 0 ? currentQueryIndex : 0];
+      coppelChart = new Chart(ctx, {
+        type: currentChartType,
+        data: {
+          labels: q.chartLabels,
+          datasets: [{
+            label: 'Impacto / Métrica Clave',
+            data: q.chartData,
+            backgroundColor: currentChartType === 'line' ? 'rgba(38, 216, 196, 0.2)' : [
+              'rgba(38, 216, 196, 0.85)',
+              'rgba(26, 136, 255, 0.85)',
+              'rgba(255, 209, 0, 0.85)',
+              'rgba(147, 51, 234, 0.85)',
+              'rgba(239, 68, 68, 0.85)'
+            ],
+            borderColor: currentChartType === 'line' ? '#26d8c4' : 'rgba(255, 255, 255, 0.25)',
+            borderWidth: 2,
+            borderRadius: 6,
+            fill: currentChartType === 'line',
+            tension: 0.35
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', size: 10 } }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#cbd5e1', font: { family: 'Plus Jakarta Sans', size: 10 } }
+            }
+          }
+        }
+      });
+    }
+
+    function setChartType(type) {
+      currentChartType = type;
+      document.getElementById('chart-btn-bar').className = type === 'bar'
+        ? 'px-2 py-0.5 rounded bg-sikai-cyan text-black font-bold cursor-pointer'
+        : 'px-2 py-0.5 rounded text-slate-400 hover:text-white cursor-pointer';
+      document.getElementById('chart-btn-line').className = type === 'line'
+        ? 'px-2 py-0.5 rounded bg-sikai-cyan text-black font-bold cursor-pointer'
+        : 'px-2 py-0.5 rounded text-slate-400 hover:text-white cursor-pointer';
+      initChart();
+    }
+
+    function updateChart(labels, data) {
+      if (!coppelChart) {
+        initChart();
+      }
+      if (!coppelChart) return;
+      coppelChart.data.labels = labels;
+      coppelChart.data.datasets[0].data = data;
+      coppelChart.update();
+    }
+
+    function generateStoryteller() {
+      const box = document.getElementById('storytellerBox');
+      storytellerAngle = (storytellerAngle + 1) % 3;
+      box.innerHTML = '<span class="text-sikai-cyan animate-pulse">⚡ Generando nuevo enfoque narrativo con Gemini 2.0 sobre BigQuery...</span>';
+      setTimeout(() => {
+        if (storytellerAngle === 0) {
+          const q = queriesDB[currentQueryIndex >= 0 ? currentQueryIndex : 0];
+          box.innerHTML = q.storyteller;
+        } else if (storytellerAngle === 1) {
+          box.innerHTML = `
+            <p class="text-coppel-yellow font-semibold">📌 Enfoque para Dirección de Finanzas (CFO / ROI):</p>
+            <p>La implementación de la capa semántica de SIKAI sobre BigQuery permite capturar entre <strong>$14.2 M y $28.6 M MXN mensuales</strong> en oportunidades de colocación y stock, mientras reduce en un <strong>38% el consumo de bytes escaneados</strong> en Google Cloud gracias al podado inteligente de particiones.</p>
+          `;
+        } else {
+          box.innerHTML = `
+            <p class="text-emerald-400 font-semibold">📌 Enfoque para Dirección de TI & Datos (CTO / CDO):</p>
+            <p>El <strong>78% de las solicitudes ad-hoc de reportes</strong> que hoy saturan al equipo de ingeniería de datos se resuelven en autoservicio conversacional con gobernanza Row-Level Security y cero exposición de datos sensibles.</p>
+          `;
+        }
+      }, 320);
+    }
+
+    function setDivision(div) {
+      const b1 = document.getElementById('div-btn-retail');
+      const b2 = document.getElementById('div-btn-banco');
+      const b3 = document.getElementById('div-btn-logistica');
+      [b1, b2, b3].forEach(b => {
+        if (b) b.className = 'px-3.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition cursor-pointer';
+      });
+
+      if (div === 'banco') {
+        b2.className = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-sikai-blue text-white transition cursor-pointer';
+        setQuery(0);
+      } else if (div === 'retail') {
+        b1.className = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-sikai-blue text-white transition cursor-pointer';
+        setQuery(1);
+      } else {
+        b3.className = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-sikai-blue text-white transition cursor-pointer';
+        setQuery(4);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      window.currentBaseMxn = 14.2;
+      initChart();
+    });
+  </script>
+</body>
+</html>
+
+
